@@ -15,12 +15,24 @@
       <div class="lock-logo">💬</div>
       <h1 class="js-site-title">Feedback Haven</h1>
       <p class="lock-sub js-site-subtitle">평가계획 · 학습자료 피드백 공간</p>
-      <form id="pw-form" class="lock-form">
+
+      <!-- 1단계: 암호 -->
+      <form id="pw-form" class="lock-form lock-step active">
         <label for="pw-input" class="sr-only">암호</label>
         <input id="pw-input" type="password" placeholder="입장 암호를 입력하세요"
                autocomplete="off" />
-        <button type="submit" class="btn btn--primary">입장하기</button>
+        <button type="submit" class="btn btn--primary">다음</button>
         <p id="pw-error" class="lock-error" role="alert"></p>
+      </form>
+
+      <!-- 2단계: 이름 선택 -->
+      <form id="name-form" class="lock-form lock-step">
+        <p class="lock-hint">이름을 선택하고 입장하세요.<br>남기는 피드백과 댓글에 이 이름이 표시됩니다.</p>
+        <label for="name-select" class="sr-only">이름</label>
+        <select id="name-select"></select>
+        <input id="name-custom" type="text" placeholder="이름을 입력하세요" autocomplete="off" hidden />
+        <button type="submit" class="btn btn--primary">입장하기</button>
+        <p id="name-error" class="lock-error" role="alert"></p>
       </form>
     </div>
   </section>
@@ -33,7 +45,14 @@
           <h1 class="js-site-title">Feedback Haven</h1>
           <p class="home-header__sub js-site-subtitle"></p>
         </div>
-        <span id="store-mode" class="store-mode"></span>
+        <div class="home-header__right">
+          <button id="user-chip" class="user-chip" title="이름 바꾸기">
+            <span class="user-chip__avatar"></span>
+            <span class="user-chip__name"></span>
+            <span class="user-chip__edit">바꾸기</span>
+          </button>
+          <span id="store-mode" class="store-mode"></span>
+        </div>
       </div>
     </header>
 
@@ -134,7 +153,7 @@
         </button>
       </div>
       <textarea id="composer-comment" rows="3" placeholder="내용을 적어주세요 (선택)"></textarea>
-      <input id="composer-name" type="text" placeholder="이름 (선택)" autocomplete="off" />
+      <p class="composer__as">작성자: <b id="composer-as"></b></p>
       <p id="composer-hint" class="composer__hint"></p>
       <div class="composer__actions">
         <button type="button" id="composer-cancel" class="btn btn--ghost">취소</button>

@@ -35,8 +35,6 @@
     if (s < 604800) return Math.floor(s / 86400) + "일 전";
     return d.toLocaleDateString("ko-KR");
   }
-  const savedName = () => localStorage.getItem("fh_name") || "";
-  const rememberName = (n) => n && localStorage.setItem("fh_name", n);
 
   // ---------- 화면 요소 ----------
   const lockView = $("#lock-view");
@@ -70,9 +68,16 @@
   // =============================================================
   //  1) 잠금(암호) 화면
   // =============================================================
+  let currentUser = localStorage.getItem("fh_name") || "";
+  const CUSTOM = "__custom__";
+
   const pwForm = $("#pw-form");
   const pwInput = $("#pw-input");
   const pwError = $("#pw-error");
+  const nameForm = $("#name-form");
+  const nameSelect = $("#name-select");
+  const nameCustom = $("#name-custom");
+  const nameError = $("#name-error");
 
   async function checkPassword(value) {
     if (cfg.PASSWORD_HASH) {
@@ -82,8 +87,40 @@
     return value === (cfg.PASSWORD_PLAIN || "");
   }
 
-  function unlock() {
+  function gotoStep(step) {
+    $$(".lock-step").forEach((s) => s.classList.remove("active"));
+    step.classList.add("active");
+  }
+
+  function buildNameOptions() {
+    const names = (cfg.NAMES || []).filter(Boolean);
+    nameSelect.innerHTML =
+      names.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join("") +
+      `<option value="${CUSTOM}">직접 입력…</option>`;
+    if (currentUser && names.includes(currentUser)) nameSelect.value = currentUser;
+    else if (!names.length) nameSelect.value = CUSTOM;
+    toggleCustom();
+  }
+  function toggleCustom() {
+    const custom = nameSelect.value === CUSTOM;
+    nameCustom.hidden = !custom;
+    if (custom) setTimeout(() => nameCustom.focus(), 50);
+  }
+  nameSelect.addEventListener("change", toggleCustom);
+  function chosenName() {
+    return nameSelect.value === CUSTOM ? nameCustom.value.trim() : nameSelect.value;
+  }
+
+  function updateUserChip() {
+    const chip = $("#user-chip");
+    if (!chip || !currentUser) return;
+    chip.querySelector(".user-chip__avatar").textContent = currentUser.slice(0, 1);
+    chip.querySelector(".user-chip__name").textContent = currentUser + "님";
+  }
+
+  function unlockToHome() {
     sessionStorage.setItem("fh_unlocked", "1");
+    updateUserChip();
     buildHome();
     show(homeView);
   }
@@ -93,19 +130,42 @@
     pwError.textContent = "";
     const ok = await checkPassword(pwInput.value);
     if (ok) {
-      unlock();
+      buildNameOptions();
+      gotoStep(nameForm);
     } else {
       pwError.textContent = "암호가 올바르지 않습니다.";
       pwInput.select();
     }
   });
 
-  // 이미 이번 세션에서 인증했다면 통과
-  if (sessionStorage.getItem("fh_unlocked") === "1") {
+  nameForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    nameError.textContent = "";
+    const name = chosenName();
+    if (!name) {
+      nameError.textContent = "이름을 선택하거나 입력하세요.";
+      return;
+    }
+    currentUser = name;
+    localStorage.setItem("fh_name", name);
+    unlockToHome();
+  });
+
+  // 이름 바꾸기 (헤더 칩 클릭)
+  $("#user-chip").addEventListener("click", () => {
+    buildNameOptions();
+    gotoStep(nameForm);
+    show(lockView);
+  });
+
+  // 이미 이번 세션에서 인증 + 이름이 있으면 통과
+  if (sessionStorage.getItem("fh_unlocked") === "1" && currentUser) {
+    updateUserChip();
     buildHome();
     show(homeView);
   } else {
     show(lockView);
+    gotoStep(pwForm);
     setTimeout(() => pwInput.focus(), 100);
   }
 
@@ -184,7 +244,10 @@
     pageWrap.innerHTML = '<div class="loading">문서를 불러오는 중…</div>';
     fbListEl.innerHTML = "";
 
-    current = { doc, viewer: null, items: [], filter: "all", unsub: null };
+    current = {
+      doc, viewer: null, items: [], comments: [],
+      filter: "all", unsub: null, openId: null
+    };
 
     try {
       const viewer = await PDFViewer.render("pdfs/" + doc.file, pageWrap, {
@@ -215,11 +278,22 @@
 
   async function refreshFeedback() {
     if (!current) return;
-    const items = await Store.list(current.doc.id);
+    const docId = current.doc.id;
+    const [items, comments] = await Promise.all([
+      Store.list(docId),
+      Store.listComments(docId)
+    ]);
+    if (!current || current.doc.id !== docId) return; // 그 사이 문서가 바뀐 경우
     current.items = items;
+    current.comments = comments;
     renderMarkers();
     renderFbList();
     updateCount();
+    updateOpenPopup();
+  }
+
+  function commentsFor(fid) {
+    return current ? current.comments.filter((c) => c.feedback_id === fid) : [];
   }
 
   function visibleItems() {
@@ -251,6 +325,13 @@
       m.style.top = f.y * 100 + "%";
       m.textContent = t.icon;
       m.title = (f.author ? f.author + ": " : "") + f.comment;
+      const cc = commentsFor(f.id).length;
+      if (cc > 0) {
+        const b = document.createElement("span");
+        b.className = "marker__count";
+        b.textContent = cc;
+        m.appendChild(b);
+      }
       m.addEventListener("click", (e) => {
         e.stopPropagation();
         openMarkerPopup(f, m);
@@ -270,6 +351,7 @@
     fbListEl.innerHTML = items
       .map((f) => {
         const t = TYPE[f.type] || TYPE.question;
+        const cc = commentsFor(f.id).length;
         return `<article class="fb-item ${t.cls}" data-id="${esc(f.id)}">
           <div class="fb-item__head">
             <span class="fb-badge ${t.cls}">${t.icon}</span>
@@ -281,6 +363,7 @@
             ${f.mine ? `<button class="fb-del" data-del="${esc(f.id)}" title="삭제">✕</button>` : ""}
           </div>
           <p class="fb-item__text">${esc(f.comment) || "<i>내용 없음</i>"}</p>
+          <div class="fb-item__foot">💬 댓글 ${cc}${cc ? "" : " · 눌러서 남기기"}</div>
         </article>`;
       })
       .join("");
@@ -296,6 +379,7 @@
             m.classList.add("pulse");
             setTimeout(() => m.classList.remove("pulse"), 1500);
           }
+          openMarkerPopup(f, m || el);
         }
       });
     });
@@ -337,11 +421,12 @@
     closeMarkerPopup();
     composerCtx = ctx;
     composer.querySelector("#composer-comment").value = "";
-    composer.querySelector("#composer-name").value = savedName();
+    composer.querySelector("#composer-as").textContent = currentUser || "익명";
+    composer.querySelector("#composer-hint").textContent = "";
     // 타입 초기화
     $$(".composer-type", composer).forEach((b) => b.classList.remove("active"));
     composer.dataset.type = "";
-    positionPopup(composer, ctx.layer, ctx.x, ctx.y);
+    positionFixed(composer, ctx.clientX, ctx.clientY);
     composer.classList.add("show");
     composer.querySelector("#composer-comment").focus();
   }
@@ -355,6 +440,7 @@
       $$(".composer-type", composer).forEach((x) => x.classList.remove("active"));
       b.classList.add("active");
       composer.dataset.type = b.dataset.type;
+      composer.querySelector("#composer-hint").textContent = "";
     })
   );
 
@@ -370,8 +456,6 @@
       return;
     }
     const comment = composer.querySelector("#composer-comment").value.trim();
-    const author = composer.querySelector("#composer-name").value.trim();
-    rememberName(author);
     const payload = {
       pdf_id: current.doc.id,
       page: composerCtx.page,
@@ -379,7 +463,7 @@
       y: composerCtx.y,
       type,
       comment,
-      author
+      author: currentUser
     };
     closeComposer();
     try {
@@ -392,12 +476,32 @@
   });
 
   // =============================================================
-  //  5) 마커 클릭 시 내용 보기 팝업
+  //  5) 마커 클릭 시 내용 + 댓글 팝업
   // =============================================================
   const mpop = $("#marker-popup");
-  function openMarkerPopup(f, markerEl) {
+
+  function renderCommentsHTML(comments) {
+    if (!comments.length)
+      return '<p class="thread__empty">아직 댓글이 없어요. 첫 댓글을 남겨보세요.</p>';
+    return comments
+      .map(
+        (c) => `<div class="cmt">
+          <div class="cmt__meta">
+            <b>${esc(c.author || "익명")}</b>
+            <span class="cmt__time">${timeAgo(c.created_at)}</span>
+            ${c.mine ? `<button class="cmt__del" data-del-cmt="${esc(c.id)}" title="삭제">✕</button>` : ""}
+          </div>
+          <p class="cmt__text">${esc(c.comment)}</p>
+        </div>`
+      )
+      .join("");
+  }
+
+  function openMarkerPopup(f, anchorEl) {
     closeComposer();
+    current.openId = f.id;
     const t = TYPE[f.type] || TYPE.question;
+    const comments = commentsFor(f.id);
     mpop.className = "popup marker-popup " + t.cls;
     mpop.innerHTML = `
       <div class="popup__head">
@@ -408,46 +512,145 @@
       <p class="popup__text">${esc(f.comment) || "<i>내용 없음</i>"}</p>
       <div class="popup__meta">
         <b>${esc(f.author || "익명")}</b> · ${timeAgo(f.created_at)} · p.${f.page}
+        ${f.mine ? '<button class="popup__del">삭제</button>' : ""}
       </div>
-      ${f.mine ? '<button class="popup__del">삭제</button>' : ""}
+      <div class="thread">
+        <div class="thread__title">💬 댓글 <span class="thread__count">${comments.length}</span></div>
+        <div class="thread__list">${renderCommentsHTML(comments)}</div>
+        <form class="thread__form">
+          <input class="thread__input" type="text" maxlength="500"
+                 placeholder="${esc(currentUser || "익명")}(으)로 댓글 달기…" />
+          <button type="submit" class="btn btn--primary thread__send">등록</button>
+        </form>
+      </div>
     `;
-    const layer = current.viewer.getLayer(f.page);
-    positionPopup(mpop, layer, f.x, f.y);
+    positionFixed(mpop, anchorEl);
     mpop.classList.add("show");
+    bindPopupHandlers(f);
+    const inp = mpop.querySelector(".thread__input");
+    if (inp) inp.focus();
+  }
 
+  function bindPopupHandlers(f) {
     mpop.querySelector(".popup__close").addEventListener("click", closeMarkerPopup);
     const del = mpop.querySelector(".popup__del");
     if (del)
       del.addEventListener("click", async () => {
-        if (!confirm("이 피드백을 삭제할까요?")) return;
+        if (!confirm("이 피드백과 댓글을 삭제할까요?")) return;
         await Store.remove(f.id);
         closeMarkerPopup();
         await refreshFeedback();
       });
+    bindCommentDeletes();
+    mpop.querySelector(".thread__form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = mpop.querySelector(".thread__input");
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      try {
+        await Store.addComment({
+          feedback_id: f.id,
+          pdf_id: current.doc.id,
+          comment: text,
+          author: currentUser
+        });
+        await refreshFeedback();
+        const again = mpop.querySelector(".thread__input");
+        if (again) again.focus();
+      } catch (err) {
+        alert("댓글 저장에 실패했습니다.");
+        console.error(err);
+        input.value = text;
+      }
+    });
   }
+
+  function bindCommentDeletes() {
+    $$(".cmt__del", mpop).forEach((btn) =>
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        if (!confirm("이 댓글을 삭제할까요?")) return;
+        await Store.removeComment(btn.dataset.delCmt);
+        await refreshFeedback();
+      })
+    );
+  }
+
+  // 실시간/새로고침 시 열려있는 팝업의 댓글만 갱신 (입력 중인 내용은 보존)
+  function updateOpenPopup() {
+    if (!current || !current.openId || !mpop.classList.contains("show")) return;
+    const f = current.items.find((x) => x.id === current.openId);
+    if (!f) {
+      closeMarkerPopup();
+      return;
+    }
+    const comments = commentsFor(f.id);
+    const listEl = mpop.querySelector(".thread__list");
+    const countEl = mpop.querySelector(".thread__count");
+    if (countEl) countEl.textContent = comments.length;
+    if (listEl) {
+      listEl.innerHTML = renderCommentsHTML(comments);
+      bindCommentDeletes();
+    }
+  }
+
   function closeMarkerPopup() {
     mpop.classList.remove("show");
+    if (current) current.openId = null;
   }
 
-  // ---- 팝업을 클릭 지점 근처에 배치 ----
-  function positionPopup(popup, layer, x, y) {
-    const pageEl = layer.closest(".page");
-    // 팝업을 페이지 요소 기준 절대배치
-    if (popup.parentElement !== pageEl) pageEl.appendChild(popup);
-    popup.style.left = x * 100 + "%";
-    popup.style.top = y * 100 + "%";
+  // ---- 팝업을 화면 좌표에 배치 (요소 또는 좌표 기준, 화면 밖으로 나가지 않게) ----
+  function positionFixed(popup, anchorOrX, maybeY) {
+    if (popup.parentElement !== document.body) document.body.appendChild(popup);
+    popup.style.position = "fixed";
+    // 크기 측정을 위해 잠시 보이되 눈에는 안 띄게
+    popup.style.visibility = "hidden";
+    popup.classList.add("show");
+    const pw = popup.offsetWidth;
+    const ph = popup.offsetHeight;
+    popup.classList.remove("show");
+    popup.style.visibility = "";
+
+    let ax, ay;
+    if (typeof anchorOrX === "number") {
+      ax = anchorOrX;
+      ay = maybeY;
+    } else if (anchorOrX && anchorOrX.getBoundingClientRect) {
+      const r = anchorOrX.getBoundingClientRect();
+      ax = r.left + r.width / 2;
+      ay = r.top + r.height / 2;
+    } else {
+      ax = window.innerWidth / 2;
+      ay = window.innerHeight / 2;
+    }
+    const gap = 14;
+    let left = ax + gap;
+    if (left + pw > window.innerWidth - 8) left = ax - gap - pw;
+    left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+    let top = ay - ph / 2;
+    top = Math.max(8, Math.min(top, window.innerHeight - ph - 8));
+    popup.style.left = left + "px";
+    popup.style.top = top + "px";
   }
+
+  // PDF 스크롤 시 팝업 닫기 (좌표가 어긋나지 않도록)
+  pageWrap.addEventListener("scroll", () => {
+    closeComposer();
+    closeMarkerPopup();
+  });
 
   // 바깥 클릭 시 팝업 닫기
-  document.addEventListener("click", (e) => {
-    if (
-      composer.classList.contains("show") &&
-      !composer.contains(e.target) &&
-      !e.target.closest(".marker-layer")
-    ) {
-      // 작성 중에는 실수 방지: 마커레이어(=PDF) 클릭은 openComposer가 재배치
+  document.addEventListener("mousedown", (e) => {
+    if (e.target.closest(".marker")) return; // 마커 클릭은 팝업 열기
+    if (composer.classList.contains("show") && !composer.contains(e.target)) {
+      closeComposer();
+    }
+    if (mpop.classList.contains("show") && !mpop.contains(e.target)) {
+      closeMarkerPopup();
     }
   });
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeComposer();

@@ -238,15 +238,13 @@ body {
 
 /* ================= 팝업 (공통) ================= */
 .popup {
-  position: absolute; z-index: 30; background: var(--surface);
+  position: fixed; z-index: 40; background: var(--surface);
   border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--line);
-  width: 268px; transform: translate(12px, 12px);
+  width: 288px; max-width: 92vw;
   opacity: 0; pointer-events: none; transition: opacity .12s;
 }
 .popup.show { opacity: 1; pointer-events: auto; }
-/* 화면 밖으로 나가지 않도록 오른쪽/아래 여백 확보는 JS 배치 + max로 */
-.composer { max-width: min(268px, 90vw); }
-#composer.show { }
+.composer { width: 272px; }
 
 .composer__types { display: flex; gap: 8px; padding: 12px 12px 0; }
 .composer-type {
@@ -279,10 +277,73 @@ body {
 .popup__close:hover { background: rgba(0,0,0,.06); }
 .popup__text { margin: 0 0 10px; font-size: 14.5px; line-height: 1.55;
   white-space: pre-wrap; word-break: break-word; }
-.popup__meta { font-size: 12.5px; color: var(--ink-soft); }
-.popup__del { margin-top: 10px; border: 0; background: #fde7e7; color: #d64545;
-  border-radius: 8px; padding: 7px 12px; cursor: pointer; font: inherit; font-weight: 600; }
+.popup__meta { font-size: 12.5px; color: var(--ink-soft); display: flex;
+  align-items: center; gap: 6px; padding: 0 14px 12px; }
+.popup__del { margin-left: auto; border: 0; background: #fde7e7; color: #d64545;
+  border-radius: 8px; padding: 5px 10px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; }
 .popup__del:hover { background: #fbd5d5; }
+.marker-popup .popup__text { padding: 0 14px; }
+
+/* ================= 댓글 스레드 ================= */
+.thread { border-top: 1px solid var(--line); padding: 12px 14px 14px; background: #fafbfe;
+  border-radius: 0 0 12px 12px; }
+.thread__title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.thread__list { max-height: 190px; overflow-y: auto; display: grid; gap: 8px; margin-bottom: 10px; }
+.thread__empty { font-size: 12.5px; color: var(--ink-soft); margin: 2px 0 4px; }
+.cmt { background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
+.cmt__meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); }
+.cmt__meta b { color: var(--ink); font-size: 12.5px; }
+.cmt__time { font-size: 11.5px; }
+.cmt__del { margin-left: auto; border: 0; background: transparent; color: var(--ink-soft);
+  cursor: pointer; font-size: 12px; padding: 1px 5px; border-radius: 5px; }
+.cmt__del:hover { background: #fde7e7; color: #d64545; }
+.cmt__text { margin: 4px 0 0; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.thread__form { display: flex; gap: 6px; }
+.thread__input { flex: 1; font: inherit; font-size: 13.5px; border: 1.5px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; outline: none; min-width: 0; }
+.thread__input:focus { border-color: var(--brand); }
+.thread__send { padding: 8px 12px; font-size: 13px; white-space: nowrap; }
+
+/* 작성 팝업: 현재 사용자 표시 */
+.composer__as { font-size: 12.5px; color: var(--ink-soft); margin: 8px 12px 0; }
+.composer__as b { color: var(--brand); }
+
+/* 마커의 댓글 수 뱃지 */
+.marker__count {
+  position: absolute; top: -7px; right: -7px; min-width: 16px; height: 16px;
+  padding: 0 4px; border-radius: 999px; background: #2b3648; color: #fff;
+  font-size: 10.5px; font-weight: 700; display: grid; place-items: center;
+  border: 1.5px solid #fff; box-sizing: border-box;
+}
+
+/* 피드백 목록 하단(댓글 수) */
+.fb-item__foot { margin-top: 8px; font-size: 12px; color: var(--ink-soft);
+  border-top: 1px dashed var(--line); padding-top: 7px; }
+
+/* ================= 잠금: 단계 & 이름 선택 ================= */
+.lock-step { display: none; }
+.lock-step.active { display: grid; gap: 12px; }
+.lock-hint { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; margin: 0 0 2px; }
+#name-select, #name-custom {
+  font: inherit; padding: 12px 14px; border: 1.5px solid var(--line);
+  border-radius: 11px; outline: none; background: var(--surface); text-align: center;
+}
+#name-select:focus, #name-custom:focus { border-color: var(--brand); }
+
+/* ================= 사용자 칩 (헤더) ================= */
+.home-header__right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.user-chip {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  border: 0; background: rgba(255,255,255,.2); color: #fff; font: inherit;
+  padding: 6px 12px 6px 6px; border-radius: 999px; transition: .15s;
+}
+.user-chip:hover { background: rgba(255,255,255,.32); }
+.user-chip__avatar {
+  width: 26px; height: 26px; border-radius: 50%; background: #fff; color: var(--brand);
+  display: grid; place-items: center; font-weight: 800; font-size: 13px;
+}
+.user-chip__name { font-weight: 700; font-size: 14px; }
+.user-chip__edit { font-size: 12px; opacity: .85; }
 
 /* ================= 반응형 ================= */
 @media (max-width: 780px) {
