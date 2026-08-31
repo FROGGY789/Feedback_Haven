@@ -191,15 +191,19 @@
       el.innerHTML = '<p class="empty">아직 등록된 문서가 없습니다. <code>assets/js/config.js</code> 의 <code>PDFS</code> 목록에 추가하세요.</p>';
       return;
     }
-    const order = [], map = {};
+    // 팀 → 선생님 → 문서 로 2단계 그룹
+    const teamOrder = [], teams = {};
     pdfs.forEach((p) => {
-      const t = p.teacher || "기타";
-      if (!map[t]) { map[t] = { name: t, grade: p.grade || "", docs: [] }; order.push(t); }
-      if (!map[t].grade && p.grade) map[t].grade = p.grade;
-      map[t].docs.push(p);
+      const tm = p.team || "자료";
+      if (!teams[tm]) { teams[tm] = { name: tm, order: [], map: {} }; teamOrder.push(tm); }
+      const T = teams[tm];
+      const tc = p.teacher || "기타";
+      if (!T.map[tc]) { T.map[tc] = { name: tc, grade: p.grade || "", docs: [] }; T.order.push(tc); }
+      if (!T.map[tc].grade && p.grade) T.map[tc].grade = p.grade;
+      T.map[tc].docs.push(p);
     });
-    el.innerHTML = order.map((t) => {
-      const g = map[t];
+
+    const teacherCard = (g) => {
       const docs = g.docs.map((d) => {
         const kind = d.category || "자료";
         const kc = kind === "평가계획" ? "q" : kind === "학습자료" ? "i" : "n";
@@ -217,6 +221,15 @@
         </div>
         <div class="teacher__docs">${docs}</div>
       </div>`;
+    };
+
+    el.innerHTML = teamOrder.map((tm) => {
+      const T = teams[tm];
+      const cards = T.order.map((tc) => teacherCard(T.map[tc])).join("");
+      return `<section class="team">
+        <div class="team__head"><span class="team__badge">멘토팀</span><h3 class="team__name">${esc(T.name)}</h3></div>
+        <div class="team__teachers">${cards}</div>
+      </section>`;
     }).join("");
     $$(".docbtn", el).forEach((b) => b.addEventListener("click", () => openDoc(b.dataset.id)));
   }

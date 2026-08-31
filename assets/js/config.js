@@ -57,7 +57,10 @@ window.APP_CONFIG = {
   NAMES: [
     { nick: "Sol",    name: "이솔다은" },
     { nick: "Jun",    name: "이준형" },
-    { nick: "Claire", name: "최유림" }
+    { nick: "Claire", name: "최유림" },
+    { nick: "윤예림", name: "" },
+    { nick: "신현호", name: "" },
+    { nick: "조선희", name: "" }
   ],
 
   /* -----------------------------------------------------------
@@ -70,14 +73,16 @@ window.APP_CONFIG = {
    *   - teacher:   (선택) 작성 선생님 이름
    * --------------------------------------------------------- */
   PDFS: [
-    // Sol 선생님
-    { id: "isolda-eval",     title: "과정중심 수행평가", category: "평가계획", file: "isolda-eval.pdf",     teacher: "Sol" },
-    { id: "isolda-material", title: "학습자료",          category: "학습자료", file: "isolda-material.pdf", teacher: "Sol" },
-    // 이준형 선생님
-    { id: "jun-eval",        title: "과정중심 수행평가", category: "평가계획", file: "jun-eval.pdf",        teacher: "이준형T" },
-    { id: "jun-material",    title: "학습자료",          category: "학습자료", file: "jun-material.pdf",    teacher: "이준형T" },
-    // 최유림 선생님 (양식)
-    { id: "choi-eval",       title: "과정중심 수행평가 양식", category: "평가계획", file: "choi-eval.pdf",     teacher: "최유림T" },
-    { id: "choi-material",   title: "학습자료 양식",          category: "학습자료", file: "choi-material.pdf", teacher: "최유림T" }
+    // ── 최유림 멘토팀 (Sol · Jun · Claire) ──
+    { id: "isolda-eval",     title: "과정중심 수행평가", category: "평가계획", file: "isolda-eval.pdf",     teacher: "Sol",    team: "최유림 멘토팀" },
+    { id: "isolda-material", title: "학습자료",          category: "학습자료", file: "isolda-material.pdf", teacher: "Sol",    team: "최유림 멘토팀" },
+    { id: "jun-eval",        title: "과정중심 수행평가", category: "평가계획", file: "jun-eval.pdf",        teacher: "Jun",    team: "최유림 멘토팀" },
+    { id: "jun-material",    title: "학습자료",          category: "학습자료", file: "jun-material.pdf",    teacher: "Jun",    team: "최유림 멘토팀" },
+    { id: "choi-eval",       title: "과정중심 수행평가 양식", category: "평가계획", file: "choi-eval.pdf",     teacher: "Claire", team: "최유림 멘토팀" },
+    { id: "choi-material",   title: "학습자료 양식",          category: "학습자료", file: "choi-material.pdf", teacher: "Claire", team: "최유림 멘토팀" },
+
+    // ── 조선희 멘토팀 ──
+    { id: "cs-eval",     title: "과정중심 수행평가", category: "평가계획", file: "choseonhui-eval.pdf",     teacher: "조선희", team: "조선희 멘토팀" },
+    { id: "cs-material", title: "학습자료",          category: "학습자료", file: "choseonhui-material.pdf", teacher: "조선희", team: "조선희 멘토팀" }
   ]
 };
