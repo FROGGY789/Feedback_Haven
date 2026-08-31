@@ -238,6 +238,8 @@
     docTitleEl.textContent = doc.title;
     docOwnerEl.textContent = doc.teacher ? doc.teacher + (doc.grade ? " · " + doc.grade : "") : "";
     show(V.doc);
+    // 브라우저 뒤로가기가 사이트를 나가지 않고 목록으로 오도록 히스토리 항목 추가
+    try { history.pushState({ fh: "doc", id }, ""); } catch (e) {}
     pageWrap.innerHTML = '<div class="loading">문서를 불러오는 중…</div>';
     fbListEl.innerHTML = "";
     pageInfo.textContent = "… / …"; progBar.style.width = "0%";
@@ -489,18 +491,33 @@
       renderMarks(); renderPanel();
     }));
 
-  $("#doc-back").addEventListener("click", () => { closeReader(); show(V.hub); });
+  function goHub() { closeReader(); show(V.hub); window.scrollTo(0, 0); }
+  $("#doc-back").addEventListener("click", goHub);
 
-  // ---- 진행바 ----
+  // 왼쪽 호버 도크 (뒤로 / 홈 / 다른 자료 — 모두 문서 목록으로)
+  $$(".reader-dock [data-nav]").forEach((btn) => btn.addEventListener("click", goHub));
+
+  // 브라우저 뒤로가기: 사이트를 나가지 않고 문서 목록으로 복귀
+  window.addEventListener("popstate", () => {
+    if (V.doc.classList.contains("active")) goHub();
+  });
+
+  // ---- 진행바 · 하단 이전/다음 ----
+  const prevBtn = $("#pdf-prev"), nextBtn = $("#pdf-next");
+  let curPage = 1, totalPages = 1;
   function updateProgress() {
     const pages = $$(".page", pageWrap);
-    if (!pages.length) { pageInfo.textContent = "0 / 0"; progBar.style.width = "0%"; return; }
+    totalPages = pages.length;
+    if (!pages.length) { pageInfo.textContent = "0 / 0"; progBar.style.width = "0%"; prevBtn.disabled = nextBtn.disabled = true; return; }
     const cr = pageWrap.getBoundingClientRect();
     const mark = cr.top + cr.height * 0.35;
     let cur = 1;
     pages.forEach((pe, i) => { if (pe.getBoundingClientRect().top <= mark) cur = i + 1; });
+    curPage = cur;
     pageInfo.textContent = cur + " / " + pages.length;
     progBar.style.width = (cur / pages.length * 100) + "%";
+    prevBtn.disabled = cur <= 1;
+    nextBtn.disabled = cur >= pages.length;
   }
 
   // 진행바의 특정 지점 클릭 → 해당 페이지로 이동
@@ -513,6 +530,8 @@
     pg = Math.max(1, Math.min(total, pg));
     current.viewer.scrollToPage(pg);
   });
+  prevBtn.addEventListener("click", () => { if (current && current.viewer && curPage > 1) current.viewer.scrollToPage(curPage - 1); });
+  nextBtn.addEventListener("click", () => { if (current && current.viewer && curPage < totalPages) current.viewer.scrollToPage(curPage + 1); });
 
   // =============================================================
   //  작성 팝업 (클릭=점 / 드래그=범위)

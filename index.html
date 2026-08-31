@@ -117,10 +117,21 @@
     </header>
     <div class="doc-body">
       <div class="paper-col">
+        <!-- 왼쪽 호버 도크 -->
+        <div class="reader-dock">
+          <button class="reader-dock__toggle" type="button" aria-label="이동 메뉴">☰</button>
+          <div class="reader-dock__menu">
+            <button type="button" data-nav="back">← 뒤로가기</button>
+            <button type="button" data-nav="home">🏠 홈으로 가기</button>
+            <button type="button" data-nav="materials">📚 다른 자료 보기</button>
+          </div>
+        </div>
         <div id="pdf-pages" class="paper-scroll"></div>
         <div class="pdf-progress">
+          <button id="pdf-prev" class="pdf-nav-btn" type="button">‹ 이전</button>
           <span id="pdf-pageinfo" class="pdf-progress__info">1 / 1</span>
           <div class="pdf-progress__track"><div id="pdf-progress-bar" class="pdf-progress__bar"></div></div>
+          <button id="pdf-next" class="pdf-nav-btn" type="button">다음 ›</button>
           <span class="pdf-progress__hint">클릭=한 지점 · 드래그=범위 형광펜</span>
         </div>
       </div>

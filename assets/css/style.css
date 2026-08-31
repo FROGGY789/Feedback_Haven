@@ -210,7 +210,16 @@ body {
 .doc-bar__right .who { margin-left:6px; }
 
 .doc-body { flex:1; min-height:0; display:grid; grid-template-columns:1fr 388px; }
-.paper-col { min-height:0; display:flex; flex-direction:column; }
+.paper-col { position:relative; min-height:0; display:flex; flex-direction:column; }
+
+/* 왼쪽 호버 도크 */
+.reader-dock { position:absolute; left:14px; top:50%; transform:translateY(-50%); z-index:15; display:flex; align-items:center; gap:10px; }
+.reader-dock__toggle { flex:none; width:44px; height:44px; border-radius:999px; border:1px solid var(--line-2); background:var(--surface); box-shadow:var(--sh-md); font-size:18px; color:var(--ink-soft); cursor:pointer; transition:.15s; }
+.reader-dock__toggle:hover { background:var(--q); color:#fff4e8; border-color:var(--q); }
+.reader-dock__menu { display:flex; flex-direction:column; gap:6px; background:var(--surface); border:1px solid var(--line-2); border-radius:18px; box-shadow:var(--sh-lg); padding:10px; opacity:0; transform:translateX(-8px); pointer-events:none; transition:.16s; }
+.reader-dock:hover .reader-dock__menu { opacity:1; transform:none; pointer-events:auto; }
+.reader-dock__menu button { font:inherit; font-size:13.5px; font-weight:600; color:var(--ink); background:transparent; border:0; border-radius:12px; padding:10px 16px; text-align:left; white-space:nowrap; cursor:pointer; transition:.12s; }
+.reader-dock__menu button:hover { background:var(--q-50); color:var(--q-700); }
 .paper-scroll { flex:1; overflow:auto; background:var(--canvas); padding:36px 0 72px; display:flex; flex-direction:column; align-items:center; gap:20px; }
 
 /* 진행바 (현재/전체 페이지) */
@@ -221,12 +230,10 @@ body {
 .pdf-progress__bar { height:100%; width:0%; border-radius:999px; background:var(--q); transition:width .18s ease; }
 .pdf-progress__hint { font-size:11.5px; color:var(--muted-2); white-space:nowrap; }
 
-/* 페이지 아래 이북 리더식 이동 버튼 */
-.page-nav { flex:none; width:884px; max-width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:-6px auto 2px; padding:0 4px; }
-.page-nav__btn { font:inherit; font-size:13px; font-weight:700; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line-2); border-radius:999px; height:38px; padding:0 20px; cursor:pointer; box-shadow:var(--sh-sm); transition:.12s; }
-.page-nav__btn:hover:not(:disabled) { background:var(--q-50); border-color:var(--q-200); color:var(--q-700); transform:translateY(-1px); }
-.page-nav__btn:disabled { opacity:.4; cursor:default; box-shadow:none; }
-.page-nav__label { font-size:12.5px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
+/* 하단 진행바의 이전/다음 버튼 */
+.pdf-nav-btn { flex:none; font:inherit; font-size:12.5px; font-weight:700; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line-2); border-radius:999px; height:32px; padding:0 15px; cursor:pointer; transition:.12s; }
+.pdf-nav-btn:hover:not(:disabled) { background:var(--q-50); border-color:var(--q-200); color:var(--q-700); }
+.pdf-nav-btn:disabled { opacity:.4; cursor:default; }
 .loading { color:var(--ink-soft); padding:60px 20px; text-align:center; }
 .loading.error { color:var(--q-700); }
 
