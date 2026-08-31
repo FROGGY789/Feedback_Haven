@@ -42,7 +42,7 @@ window.APP_CONFIG = {
   SUPABASE_URL: "https://xxxx.supabase.co",   // 1번에서 복사한 값
   SUPABASE_ANON_KEY: "eyJhbGciOi...",         // 1번에서 복사한 값
 
-  NAMES: ["이솔다은T", "Jun", "Claire"],       // 입장 시 고를 이름 목록
+  NAMES: ["Sol", "Jun", "Claire"],            // 입장 시 고를 이름 목록
 
   // 화면 문구 (자유롭게 수정)
   KICKER: "2026 천안 영어교사 멘토링 PET",     // 입장 화면 상단 라벨

@@ -97,17 +97,23 @@ body {
 .pill-row { display:flex; gap:12px; margin-top:30px; }
 
 /* ================= 1. 입장 ================= */
-.gate { min-height:100vh; display:grid; grid-template-columns:1.02fr .98fr; }
-.gate__brand { padding:52px 60px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
-.gate__deco { position:absolute; border-radius:999px; }
-.gate__deco--1 { width:520px; height:520px; background:var(--bg-2); right:-190px; bottom:-160px; }
-.gate__deco--2 { width:210px; height:210px; background:var(--i-100); left:270px; top:-70px; }
+.gate {
+  position:relative; overflow:hidden;
+  min-height:100vh; display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,392px);
+  align-items:center; gap:52px;
+  max-width:1000px; margin:0 auto; padding:48px 32px;
+}
+.gate__brand { display:flex; flex-direction:column; gap:26px; }
+.gate__deco { position:absolute; border-radius:999px; z-index:0; }
+.gate__deco--1 { width:460px; height:460px; background:var(--bg-2); right:-170px; bottom:-150px; }
+.gate__deco--2 { width:190px; height:190px; background:var(--i-100); left:12%; top:24px; }
 .gate__kicker { position:relative; display:flex; align-items:center; gap:12px; }
-.gate__hero { position:relative; max-width:520px; animation:fh-up .6s ease both; }
-.gate__hero .display { font-size:74px; margin-bottom:20px; }
-.gate__sub { font-size:17.5px; line-height:1.75; color:var(--ink-soft); margin:0; max-width:430px; }
-.gate__help { position:relative; font-size:12.5px; color:var(--muted); max-width:460px; }
-.gate__panel { padding:52px 60px; display:flex; align-items:center; justify-content:center; }
+.gate__hero { position:relative; max-width:540px; animation:fh-up .6s ease both; }
+.gate__hero .display { font-size:66px; margin-bottom:20px; }
+.gate__sub { font-size:17px; line-height:1.75; color:var(--ink-soft); margin:0; max-width:440px; }
+.gate__help { position:relative; font-size:12.5px; color:var(--muted); max-width:470px; }
+.gate__panel { position:relative; display:flex; align-items:center; justify-content:center; }
 
 .pass-card { width:100%; max-width:392px; background:var(--surface); border-radius:28px; padding:34px 32px 30px; box-shadow:var(--sh-lg); animation:fh-up .65s .06s ease both; }
 .pass-card__label { font-size:11.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }

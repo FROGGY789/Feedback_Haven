@@ -54,7 +54,7 @@ window.APP_CONFIG = {
    *   여기서 고른 이름으로 피드백(?/!)과 댓글이 작성됩니다.
    *   (목록에 없으면 '직접 입력'을 선택해 새 이름을 넣을 수 있어요)
    * --------------------------------------------------------- */
-  NAMES: ["이솔다은T", "Jun", "Claire"],
+  NAMES: ["Sol", "Jun", "Claire"],
 
   /* -----------------------------------------------------------
    * 5) 문서 목록
@@ -66,20 +66,14 @@ window.APP_CONFIG = {
    *   - teacher:   (선택) 작성 선생님 이름
    * --------------------------------------------------------- */
   PDFS: [
-    // 예시입니다. pdfs/ 폴더에 실제 파일을 넣고 아래를 바꿔주세요.
-    {
-      id: "sample-plan-01",
-      title: "1학기 수학 평가계획 (예시)",
-      category: "평가계획",
-      file: "sample-plan-01.pdf",
-      teacher: "김선생"
-    },
-    {
-      id: "sample-material-01",
-      title: "함수 단원 학습자료 (예시)",
-      category: "학습자료",
-      file: "sample-material-01.pdf",
-      teacher: "이선생"
-    }
+    // Sol 선생님
+    { id: "isolda-eval",     title: "과정중심 수행평가", category: "평가계획", file: "isolda-eval.pdf",     teacher: "Sol" },
+    { id: "isolda-material", title: "학습자료",          category: "학습자료", file: "isolda-material.pdf", teacher: "Sol" },
+    // 이준형 선생님
+    { id: "jun-eval",        title: "과정중심 수행평가", category: "평가계획", file: "jun-eval.pdf",        teacher: "이준형T" },
+    { id: "jun-material",    title: "학습자료",          category: "학습자료", file: "jun-material.pdf",    teacher: "이준형T" },
+    // 최유림 선생님 (양식)
+    { id: "choi-eval",       title: "과정중심 수행평가 양식", category: "평가계획", file: "choi-eval.pdf",     teacher: "최유림T" },
+    { id: "choi-material",   title: "학습자료 양식",          category: "학습자료", file: "choi-material.pdf", teacher: "최유림T" }
   ]
 };
