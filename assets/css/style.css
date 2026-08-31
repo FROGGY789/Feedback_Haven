@@ -207,7 +207,7 @@ body {
 .loading.error { color:var(--q-700); }
 
 /* PDF 페이지 = 종이 */
-.page { position:relative; background:#fff; border-radius:16px; box-shadow:var(--sh-lg); overflow:hidden; }
+.page { position:relative; flex:none; background:#fff; border-radius:16px; box-shadow:var(--sh-lg); overflow:hidden; }
 .page canvas { display:block; }
 .marker-layer { position:absolute; inset:0; cursor:crosshair; }
 

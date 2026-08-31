@@ -18,7 +18,13 @@ const PDFViewer = (function () {
     handlers = handlers || {};
     container.innerHTML = "";
 
-    const pdf = await window.pdfjsLib.getDocument(url).promise;
+    const pdf = await window.pdfjsLib.getDocument({
+      url,
+      // 한글(CJK) 및 표준 글꼴이 제대로 그려지도록 매핑 데이터 지정
+      cMapUrl: "assets/vendor/pdfjs/cmaps/",
+      cMapPacked: true,
+      standardFontDataUrl: "assets/vendor/pdfjs/standard_fonts/"
+    }).promise;
     const layers = {}; // page number -> marker-layer element
 
     // 컨테이너 폭에 맞춰 렌더링 (여백 고려)
