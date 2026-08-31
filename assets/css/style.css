@@ -216,9 +216,17 @@ body {
 /* 진행바 (현재/전체 페이지) */
 .pdf-progress { flex:none; display:flex; align-items:center; gap:12px; padding:9px 18px; background:var(--bg); border-top:1px solid var(--line); }
 .pdf-progress__info { font-size:12.5px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; white-space:nowrap; }
-.pdf-progress__track { flex:1; height:7px; border-radius:999px; background:var(--bg-2); overflow:hidden; }
+.pdf-progress__track { flex:1; height:12px; border-radius:999px; background:var(--bg-2); overflow:hidden; cursor:pointer; }
+.pdf-progress__track:hover { background:var(--q-100); }
 .pdf-progress__bar { height:100%; width:0%; border-radius:999px; background:var(--q); transition:width .18s ease; }
 .pdf-progress__hint { font-size:11.5px; color:var(--muted-2); white-space:nowrap; }
+
+/* 페이지 아래 이북 리더식 이동 버튼 */
+.page-nav { flex:none; width:884px; max-width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:-6px auto 2px; padding:0 4px; }
+.page-nav__btn { font:inherit; font-size:13px; font-weight:700; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line-2); border-radius:999px; height:38px; padding:0 20px; cursor:pointer; box-shadow:var(--sh-sm); transition:.12s; }
+.page-nav__btn:hover:not(:disabled) { background:var(--q-50); border-color:var(--q-200); color:var(--q-700); transform:translateY(-1px); }
+.page-nav__btn:disabled { opacity:.4; cursor:default; box-shadow:none; }
+.page-nav__label { font-size:12.5px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
 .loading { color:var(--ink-soft); padding:60px 20px; text-align:center; }
 .loading.error { color:var(--q-700); }
 

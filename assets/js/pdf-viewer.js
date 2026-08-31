@@ -114,6 +114,21 @@ const PDFViewer = (function () {
       container.appendChild(pageEl);
       layers[n] = layer;
 
+      // 페이지 아래 이북 리더식 이동 버튼 (‹ 이전 / 다음 ›)
+      const nav = document.createElement("div");
+      nav.className = "page-nav";
+      nav.innerHTML =
+        `<button type="button" class="page-nav__btn" data-goto="${n - 1}"${n === 1 ? " disabled" : ""}>‹ 이전</button>` +
+        `<span class="page-nav__label">${n} / ${pdf.numPages}</span>` +
+        `<button type="button" class="page-nav__btn" data-goto="${n + 1}"${n === pdf.numPages ? " disabled" : ""}>다음 ›</button>`;
+      container.appendChild(nav);
+      nav.querySelectorAll("[data-goto]").forEach((btn) =>
+        btn.addEventListener("click", () => {
+          const el = container.querySelector('.page[data-page="' + btn.dataset.goto + '"]');
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        })
+      );
+
       // 클릭 = 점 피드백 / 드래그 = 범위(형광펜) 피드백
       attachSelect(layer, n, handlers);
 

@@ -424,6 +424,17 @@
     progBar.style.width = (cur / pages.length * 100) + "%";
   }
 
+  // 진행바의 특정 지점 클릭 → 해당 페이지로 이동
+  $(".pdf-progress__track").addEventListener("click", (e) => {
+    if (!current || !current.viewer) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const frac = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    const total = current.viewer.numPages || 1;
+    let pg = Math.round(frac * total) || 1;
+    pg = Math.max(1, Math.min(total, pg));
+    current.viewer.scrollToPage(pg);
+  });
+
   // =============================================================
   //  작성 팝업 (클릭=점 / 드래그=범위)
   // =============================================================

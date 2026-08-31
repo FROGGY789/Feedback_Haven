@@ -56,12 +56,11 @@ const Store = (function () {
           x: fb.x,
           y: fb.y,
           type: fb.type,
-          comment: fb.comment || "",
+          // 범위(형광펜) 정보는 별도 컬럼 없이 comment 안에 담아 저장 → DB 변경 불필요
+          comment: packComment(fb.w, fb.h, fb.comment),
           author: fb.author || null,
           client_id: CLIENT_ID
         };
-        // 범위(형광펜) 피드백일 때만 w,h 전송 → 점 피드백은 컬럼 없이도 동작
-        if (fb.w > 0 || fb.h > 0) { row.w = fb.w; row.h = fb.h; }
         const { data, error } = await client
           .from(TABLE)
           .insert(row)
@@ -173,10 +172,8 @@ const Store = (function () {
           page: fb.page,
           x: fb.x,
           y: fb.y,
-          w: fb.w || 0,
-          h: fb.h || 0,
           type: fb.type,
-          comment: fb.comment || "",
+          comment: packComment(fb.w, fb.h, fb.comment),
           author: fb.author || null,
           client_id: CLIENT_ID,
           created_at: new Date().toISOString()
@@ -226,17 +223,37 @@ const Store = (function () {
     };
   }
 
+  // 범위(형광펜) 정보를 comment 앞부분에 담고 빼는 헬퍼 (DB 스키마 변경 없이 동작)
+  const RGN = "␟"; // 잘 안 쓰이는 구분 문자
+  function packComment(w, h, comment) {
+    comment = comment || "";
+    if (w > 0 && h > 0) return RGN + w.toFixed(4) + "," + h.toFixed(4) + RGN + comment;
+    return comment;
+  }
+  function unpackComment(raw) {
+    raw = raw || "";
+    if (raw.charAt(0) === RGN) {
+      const i = raw.indexOf(RGN, 1);
+      if (i > 0) {
+        const n = raw.slice(1, i).split(",");
+        return { w: parseFloat(n[0]) || 0, h: parseFloat(n[1]) || 0, comment: raw.slice(i + 1) };
+      }
+    }
+    return { w: 0, h: 0, comment: raw };
+  }
+
   function normalize(row) {
+    const u = unpackComment(row.comment);
     return {
       id: row.id,
       pdf_id: row.pdf_id,
       page: Number(row.page),
       x: Number(row.x),
       y: Number(row.y),
-      w: Number(row.w) || 0,
-      h: Number(row.h) || 0,
+      w: u.w,
+      h: u.h,
       type: row.type,
-      comment: row.comment || "",
+      comment: u.comment,
       author: row.author || "",
       client_id: row.client_id || "",
       created_at: row.created_at,
