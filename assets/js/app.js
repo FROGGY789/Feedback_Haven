@@ -87,6 +87,52 @@
     return value === (cfg.PASSWORD_PLAIN || "");
   }
 
+  // 화면 자판 (A~Z 클릭으로 암호 입력)
+  (function buildKeyboard() {
+    const kb = $("#pw-keyboard");
+    if (!kb) return;
+    const rows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+    rows.forEach((row) => {
+      const r = document.createElement("div");
+      r.className = "keyboard__row";
+      row.split("").forEach((ch) => {
+        const k = document.createElement("button");
+        k.type = "button";
+        k.className = "key";
+        k.textContent = ch;
+        k.addEventListener("click", () => {
+          pwInput.value += ch;
+          pwError.textContent = "";
+          pwInput.focus();
+        });
+        r.appendChild(k);
+      });
+      kb.appendChild(r);
+    });
+    // 지우기 · 전체삭제 줄
+    const r = document.createElement("div");
+    r.className = "keyboard__row";
+    const back = document.createElement("button");
+    back.type = "button";
+    back.className = "key key--wide";
+    back.textContent = "⌫ 지우기";
+    back.addEventListener("click", () => {
+      pwInput.value = pwInput.value.slice(0, -1);
+      pwInput.focus();
+    });
+    const clr = document.createElement("button");
+    clr.type = "button";
+    clr.className = "key key--wide";
+    clr.textContent = "전체삭제";
+    clr.addEventListener("click", () => {
+      pwInput.value = "";
+      pwInput.focus();
+    });
+    r.appendChild(back);
+    r.appendChild(clr);
+    kb.appendChild(r);
+  })();
+
   function gotoStep(step) {
     $$(".lock-step").forEach((s) => s.classList.remove("active"));
     step.classList.add("active");

@@ -330,6 +330,19 @@ body {
 }
 #name-select:focus, #name-custom:focus { border-color: var(--brand); }
 
+/* 화면 자판 */
+.keyboard { display: grid; gap: 6px; margin: 2px 0; }
+.keyboard__row { display: flex; justify-content: center; gap: 5px; }
+.key {
+  font: inherit; font-weight: 700; font-size: 15px; color: var(--ink);
+  background: #eef1f7; border: 1px solid var(--line); border-radius: 8px;
+  min-width: 30px; height: 40px; flex: 1; max-width: 40px; cursor: pointer;
+  transition: .1s; padding: 0;
+}
+.key:hover { background: #e2e7f2; }
+.key:active { background: var(--brand); color: #fff; transform: translateY(1px); }
+.key--wide { max-width: 120px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+
 /* ================= 사용자 칩 (헤더) ================= */
 .home-header__right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .user-chip {

@@ -19,8 +19,9 @@
       <!-- 1단계: 암호 -->
       <form id="pw-form" class="lock-form lock-step active">
         <label for="pw-input" class="sr-only">암호</label>
-        <input id="pw-input" type="password" placeholder="입장 암호를 입력하세요"
+        <input id="pw-input" type="password" placeholder="암호 입력 (아래 자판 클릭 또는 키보드)"
                autocomplete="off" />
+        <div id="pw-keyboard" class="keyboard" aria-label="화면 자판"></div>
         <button type="submit" class="btn btn--primary">다음</button>
         <p id="pw-error" class="lock-error" role="alert"></p>
       </form>

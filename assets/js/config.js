@@ -19,7 +19,7 @@ window.APP_CONFIG = {
    *     해시는 tools/password.html 을 브라우저로 열어 만들 수 있어요.
    *   - PASSWORD_HASH 가 채워져 있으면 그것을 우선 사용합니다.
    * --------------------------------------------------------- */
-  PASSWORD_PLAIN: "changeme",
+  PASSWORD_PLAIN: "PET",
   PASSWORD_HASH: "", // 예: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 
   /* -----------------------------------------------------------
