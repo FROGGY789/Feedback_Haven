@@ -60,6 +60,8 @@ const Store = (function () {
           author: fb.author || null,
           client_id: CLIENT_ID
         };
+        // 범위(형광펜) 피드백일 때만 w,h 전송 → 점 피드백은 컬럼 없이도 동작
+        if (fb.w > 0 || fb.h > 0) { row.w = fb.w; row.h = fb.h; }
         const { data, error } = await client
           .from(TABLE)
           .insert(row)
@@ -171,6 +173,8 @@ const Store = (function () {
           page: fb.page,
           x: fb.x,
           y: fb.y,
+          w: fb.w || 0,
+          h: fb.h || 0,
           type: fb.type,
           comment: fb.comment || "",
           author: fb.author || null,
@@ -229,6 +233,8 @@ const Store = (function () {
       page: Number(row.page),
       x: Number(row.x),
       y: Number(row.y),
+      w: Number(row.w) || 0,
+      h: Number(row.h) || 0,
       type: row.type,
       comment: row.comment || "",
       author: row.author || "",

@@ -9,6 +9,8 @@ create table if not exists public.feedback (
   page        int         not null,
   x           real        not null,          -- 페이지 내 가로 위치 (0~1)
   y           real        not null,          -- 페이지 내 세로 위치 (0~1)
+  w           real        not null default 0, -- 범위(형광펜) 너비 (0이면 점 피드백)
+  h           real        not null default 0, -- 범위(형광펜) 높이
   type        text        not null check (type in ('question','impression')),
   comment     text        not null default '',
   author      text,
@@ -17,6 +19,10 @@ create table if not exists public.feedback (
 );
 
 create index if not exists feedback_pdf_id_idx on public.feedback (pdf_id);
+
+-- 이미 feedback 테이블을 만든 경우: 범위(형광펜) 컬럼 추가 (한 번만 실행)
+alter table public.feedback add column if not exists w real not null default 0;
+alter table public.feedback add column if not exists h real not null default 0;
 
 -- 행 수준 보안(RLS) 켜기
 alter table public.feedback enable row level security;

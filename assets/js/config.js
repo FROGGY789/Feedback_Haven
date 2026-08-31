@@ -49,12 +49,16 @@ window.APP_CONFIG = {
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpubXN1d2dqZG55bHNkb21hYWFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNTEyNjAsImV4cCI6MjEwMzcyNzI2MH0.2JN_mTyJ9MsnGtfzFGh8_agjUg6VCLsOSqvl9_YvylM",
 
   /* -----------------------------------------------------------
-   * 4) 이름 목록
-   *   입장할 때 드롭다운에서 이름을 고릅니다.
-   *   여기서 고른 이름으로 피드백(?/!)과 댓글이 작성됩니다.
-   *   (목록에 없으면 '직접 입력'을 선택해 새 이름을 넣을 수 있어요)
+   * 4) 이름 목록 (입장 시 카드에서 선택)
+   *   nick = 화면에 뜨는 닉네임(피드백·댓글 작성자로 표시),
+   *   name = 선생님 실명(닉네임 아래에 "○○○ 선생님" 으로 표시)
+   *   목록에 없으면 '직접 입력'으로 닉네임·성함을 넣어 추가할 수 있어요.
    * --------------------------------------------------------- */
-  NAMES: ["Sol", "Jun", "Claire"],
+  NAMES: [
+    { nick: "Sol",    name: "이솔다은" },
+    { nick: "Jun",    name: "이준형" },
+    { nick: "Claire", name: "최유림" }
+  ],
 
   /* -----------------------------------------------------------
    * 5) 문서 목록

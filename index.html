@@ -55,7 +55,12 @@
       <h2 class="display display--md">어느 선생님이신가요?</h2>
       <p class="name__sub">남기는 피드백과 댓글에 이 이름이 함께 표시됩니다.</p>
       <div id="name-grid" class="person-grid"></div>
-      <input id="name-custom" class="name__custom" type="text" placeholder="이름을 입력하세요" autocomplete="off" hidden />
+      <div id="name-custom-box" class="custombox" hidden>
+        <label class="field"><span>닉네임</span>
+          <input id="name-nick" type="text" placeholder="예: Sol" autocomplete="off" /></label>
+        <label class="field"><span>선생님 성함</span>
+          <input id="name-real" type="text" placeholder="예: 이솔다은" autocomplete="off" /></label>
+      </div>
       <div class="name__foot">
         <button id="name-enter" class="btn btn--primary btn--lg" disabled>입장하기</button>
         <span id="name-hint" class="name__hint">이름을 먼저 선택해 주세요.</span>
@@ -111,7 +116,14 @@
       </div>
     </header>
     <div class="doc-body">
-      <div id="pdf-pages" class="paper-scroll"></div>
+      <div class="paper-col">
+        <div id="pdf-pages" class="paper-scroll"></div>
+        <div class="pdf-progress">
+          <span id="pdf-pageinfo" class="pdf-progress__info">1 / 1</span>
+          <div class="pdf-progress__track"><div id="pdf-progress-bar" class="pdf-progress__bar"></div></div>
+          <span class="pdf-progress__hint">클릭=한 지점 · 드래그=범위 형광펜</span>
+        </div>
+      </div>
       <aside class="fb-panel">
         <div class="fb-panel__head">
           <div class="fb-panel__titlerow">

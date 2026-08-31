@@ -14,6 +14,62 @@ const PDFViewer = (function () {
       "assets/vendor/pdfjs/pdf.worker.min.js";
   }
 
+  // 클릭/드래그 선택 처리
+  function attachSelect(layer, pageNum, handlers) {
+    const DRAG_MIN = 0.02; // 이보다 작으면 '클릭(점)' 으로 간주
+    let dragging = false, sx = 0, sy = 0, box = null;
+    const norm = (e) => {
+      const r = layer.getBoundingClientRect();
+      return {
+        x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)),
+        y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))
+      };
+    };
+    layer.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      if (e.target.closest(".marker, .region")) return; // 기존 표시 클릭은 제외
+      const p = norm(e);
+      sx = p.x; sy = p.y; dragging = true;
+      box = null;
+    });
+    layer.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      const p = norm(e);
+      if (!box && (Math.abs(p.x - sx) > DRAG_MIN || Math.abs(p.y - sy) > DRAG_MIN)) {
+        box = document.createElement("div");
+        box.className = "sel-rect";
+        layer.appendChild(box);
+      }
+      if (box) {
+        const x = Math.min(sx, p.x), y = Math.min(sy, p.y);
+        const w = Math.abs(p.x - sx), h = Math.abs(p.y - sy);
+        box.style.left = x * 100 + "%"; box.style.top = y * 100 + "%";
+        box.style.width = w * 100 + "%"; box.style.height = h * 100 + "%";
+      }
+    });
+    const finish = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      const p = norm(e);
+      const w = Math.abs(p.x - sx), h = Math.abs(p.y - sy);
+      if (box) { box.remove(); box = null; }
+      if (!handlers.onSelect) return;
+      if (w > DRAG_MIN && h > DRAG_MIN) {
+        handlers.onSelect({
+          page: pageNum, x: Math.min(sx, p.x), y: Math.min(sy, p.y), w, h,
+          clientX: e.clientX, clientY: e.clientY, layer
+        });
+      } else {
+        handlers.onSelect({
+          page: pageNum, x: sx, y: sy, w: 0, h: 0,
+          clientX: e.clientX, clientY: e.clientY, layer
+        });
+      }
+    };
+    layer.addEventListener("mouseup", finish);
+    layer.addEventListener("mouseleave", (e) => { if (dragging) finish(e); });
+  }
+
   async function render(url, container, handlers) {
     handlers = handlers || {};
     container.innerHTML = "";
@@ -58,24 +114,8 @@ const PDFViewer = (function () {
       container.appendChild(pageEl);
       layers[n] = layer;
 
-      // 클릭 → 정규화 좌표(0~1)로 변환하여 콜백
-      layer.addEventListener("click", (e) => {
-        // 마커 자체를 클릭한 경우는 무시 (마커가 자체 처리)
-        if (e.target.closest(".marker")) return;
-        const rect = layer.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width;
-        const y = (e.clientY - rect.top) / rect.height;
-        if (handlers.onPageClick) {
-          handlers.onPageClick({
-            page: n,
-            x: Math.max(0, Math.min(1, x)),
-            y: Math.max(0, Math.min(1, y)),
-            clientX: e.clientX,
-            clientY: e.clientY,
-            layer
-          });
-        }
-      });
+      // 클릭 = 점 피드백 / 드래그 = 범위(형광펜) 피드백
+      attachSelect(layer, n, handlers);
 
       await page.render({
         canvasContext: ctx,
