@@ -269,6 +269,19 @@ body {
 
 .fb-card { background:#fff; border-radius:22px; padding:16px 18px; border-left:5px solid var(--q); box-shadow:var(--sh-sm); cursor:pointer; }
 .fb-card.i { border-left-color:var(--i); }
+/* 핀/범위 클릭 시 해당 카드 반짝 */
+.fb-card.flash { animation:fh-cardflash-q 1.2s ease; }
+.fb-card.i.flash { animation:fh-cardflash-i 1.2s ease; }
+@keyframes fh-cardflash-q {
+  0%   { box-shadow:0 0 0 3px var(--q-300), var(--sh-md); background:var(--q-50); }
+  15%  { box-shadow:0 0 0 3px var(--q-300), var(--sh-md); background:var(--q-50); }
+  100% { box-shadow:var(--sh-sm); background:#fff; }
+}
+@keyframes fh-cardflash-i {
+  0%   { box-shadow:0 0 0 3px var(--i-300), var(--sh-md); background:var(--i-50); }
+  15%  { box-shadow:0 0 0 3px var(--i-300), var(--sh-md); background:var(--i-50); }
+  100% { box-shadow:var(--sh-sm); background:#fff; }
+}
 .fb-card__head { display:flex; align-items:center; gap:9px; margin-bottom:8px; }
 .mark { flex:none; width:24px; height:24px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-family:var(--font-head); font-size:13px; }
 .mark--q { background:var(--q-100); color:var(--q-700); }
@@ -313,6 +326,29 @@ body {
 .draft__hint { min-height:16px; font-size:12px; font-weight:600; color:var(--q-700); padding:6px 2px 0; }
 .draft__actions { display:flex; justify-content:flex-end; gap:8px; margin-top:6px; }
 .draft__actions .btn--primary { height:34px; font-size:12.5px; padding:0 18px; font-family:var(--font-body); font-weight:700; }
+
+/* ================= 마크 클릭 팝업 ================= */
+.btn--del { height:32px; padding:0 14px; font-size:12px; background:#f4d9d0; color:#a3371a; }
+.btn--del:hover { background:#eec4b7; }
+.markpop { position:fixed; z-index:45; width:300px; max-width:92vw; background:#fff; border:1px solid var(--line-2); border-top:4px solid var(--q); border-radius:20px; padding:14px 16px; box-shadow:var(--sh-lg); opacity:0; pointer-events:none; transition:opacity .12s; }
+.markpop.i { border-top-color:var(--i); }
+.markpop.show { opacity:1; pointer-events:auto; animation:fh-pop .16s ease both; }
+.markpop__head { display:flex; align-items:center; gap:8px; margin-bottom:9px; }
+.markpop__who { font-size:13.5px; font-weight:700; }
+.markpop__when { font-size:11.5px; color:var(--muted-2); margin-left:auto; }
+.markpop__close { border:0; background:transparent; color:var(--muted-2); cursor:pointer; font-size:14px; padding:2px 5px; border-radius:6px; }
+.markpop__close:hover { background:var(--bg-2); color:var(--ink); }
+.markpop__text { font-size:14px; line-height:1.7; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+.markpop__edit { width:100%; height:84px; resize:none; border:1px solid var(--line-2); border-radius:14px; padding:10px 12px; font:inherit; font-size:14px; line-height:1.6; color:var(--ink); background:var(--surface); outline:none; }
+.markpop__edit:focus { border-color:var(--q); }
+.markpop__actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+
+/* ================= 마크 호버 말풍선 ================= */
+.marktip { position:fixed; z-index:46; max-width:280px; background:var(--dark); color:#fdf6e8; font-size:13px; line-height:1.55; padding:9px 13px; border-radius:14px; box-shadow:var(--sh-md); opacity:0; pointer-events:none; transition:opacity .1s; white-space:pre-wrap; word-break:break-word; }
+.marktip.show { opacity:1; }
+.marktip b { color:var(--q-300); margin-right:6px; }
+.marktip.i b { color:var(--i-300); }
+.marktip::after { content:""; position:absolute; left:50%; bottom:-6px; transform:translateX(-50%); border:6px solid transparent; border-top-color:var(--dark); border-bottom:0; }
 
 /* ================= 반응형 ================= */
 @media (max-width: 900px) {

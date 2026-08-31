@@ -70,6 +70,14 @@ const Store = (function () {
         return normalize(data);
       },
 
+      async update(id, fb) {
+        const { error } = await client
+          .from(TABLE)
+          .update({ comment: packComment(fb.w, fb.h, fb.comment) })
+          .eq("id", id);
+        if (error) throw error;
+      },
+
       async remove(id) {
         // 관련 댓글도 함께 삭제
         await client.from(CTABLE).delete().eq("feedback_id", id);
@@ -182,6 +190,12 @@ const Store = (function () {
         arr.push(row);
         write(KEY, arr);
         return normalize(row);
+      },
+
+      async update(id, fb) {
+        const arr = read(KEY);
+        const it = arr.find((x) => x.id === id);
+        if (it) { it.comment = packComment(fb.w, fb.h, fb.comment); write(KEY, arr); }
       },
 
       async remove(id) {

@@ -302,8 +302,15 @@
         el.textContent = t.icon;
       }
       el.dataset.id = f.id;
-      el.title = (f.author ? f.author + ": " : "") + f.comment;
-      el.addEventListener("click", (e) => { e.stopPropagation(); focusCard(f.id); });
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const r = el.getBoundingClientRect();
+        openMarkPopup(f, r.left + r.width / 2, r.top + Math.min(r.height, 30) / 2);
+        flashCard(f.id);
+        hideTip();
+      });
+      el.addEventListener("mouseenter", () => showTip(f, el));
+      el.addEventListener("mouseleave", hideTip);
       layer.appendChild(el);
     });
   }
@@ -311,11 +318,83 @@
     const el = $(`.marker[data-id="${CSS.escape(fid)}"], .region[data-id="${CSS.escape(fid)}"]`, pageWrap);
     if (el) { el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
   }
-  function focusCard(fid) {
+  function flashCard(fid) {
     const card = $(`.fb-card[data-id="${CSS.escape(fid)}"]`, fbListEl);
     if (card) { card.scrollIntoView({ behavior: "smooth", block: "center" }); card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash"); }
-    flashMark(fid);
   }
+
+  // ---- 마크 호버 말풍선 ----
+  const markTip = $("#mark-tip");
+  function showTip(f, el) {
+    if (markPop.classList.contains("show")) return;
+    const t = TYPE[f.type] || TYPE.question;
+    markTip.className = "marktip " + t.cls;
+    markTip.innerHTML = `<b>${esc(f.author || "익명")}</b>${esc(f.comment) || "<i>내용 없음</i>"}`;
+    markTip.style.visibility = "hidden"; markTip.classList.add("show");
+    const tw = markTip.offsetWidth, th = markTip.offsetHeight;
+    markTip.style.visibility = "";
+    const r = el.getBoundingClientRect();
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+    let top = r.top - th - 10;
+    if (top < 8) top = r.bottom + 10;
+    markTip.style.left = left + "px"; markTip.style.top = top + "px";
+  }
+  function hideTip() { markTip.classList.remove("show"); }
+
+  // ---- 마크 클릭 팝업 (내용 보기 · 수정 · 삭제) ----
+  const markPop = $("#mark-pop");
+  function markPopHTML(f, editing) {
+    const t = TYPE[f.type] || TYPE.question;
+    const range = f.w > 0 && f.h > 0 ? '<span class="fb-card__range">범위</span>' : "";
+    const body = editing
+      ? `<textarea class="markpop__edit">${esc(f.comment)}</textarea>`
+      : `<div class="markpop__text">${esc(f.comment) || "<i>내용 없음</i>"}</div>`;
+    let actions = "";
+    if (f.mine) {
+      actions = editing
+        ? `<button type="button" class="btn btn--soft btn--sm" data-mp="cancel">취소</button>
+           <button type="button" class="btn btn--primary btn--sm" data-mp="save">저장</button>`
+        : `<button type="button" class="btn btn--soft btn--sm" data-mp="edit">수정</button>
+           <button type="button" class="btn btn--del btn--sm" data-mp="del">삭제</button>`;
+    }
+    return `<div class="markpop__head">
+        <span class="mark mark--${t.cls}">${t.icon}</span>
+        <span class="markpop__who">${esc(f.author || "익명")}</span>
+        ${range}
+        <span class="markpop__when">${timeAgo(f.created_at)}</span>
+        <button type="button" class="markpop__close" data-mp="close" aria-label="닫기">✕</button>
+      </div>
+      ${body}
+      ${actions ? `<div class="markpop__actions">${actions}</div>` : ""}`;
+  }
+  function openMarkPopup(f, ax, ay, editing) {
+    const t = TYPE[f.type] || TYPE.question;
+    markPop.className = "markpop " + t.cls;
+    markPop.innerHTML = markPopHTML(f, !!editing);
+    positionFixed(markPop, ax, ay);
+    markPop.classList.add("show");
+    if (editing) { const ta = markPop.querySelector(".markpop__edit"); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } }
+    markPop.querySelectorAll("[data-mp]").forEach((btn) =>
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const act = btn.dataset.mp;
+        if (act === "close") return closeMarkPopup();
+        if (act === "edit") return openMarkPopup(f, ax, ay, true);
+        if (act === "cancel") return openMarkPopup(f, ax, ay, false);
+        if (act === "del") {
+          if (!confirm("이 피드백과 댓글을 삭제할까요?")) return;
+          await Store.remove(f.id); closeMarkPopup(); await refresh(); return;
+        }
+        if (act === "save") {
+          const txt = (markPop.querySelector(".markpop__edit").value || "").trim();
+          if (!txt) return;
+          try { await Store.update(f.id, { w: f.w, h: f.h, comment: txt }); closeMarkPopup(); await refresh(); }
+          catch (err) { alert("수정에 실패했습니다."); console.error(err); }
+        }
+      }));
+  }
+  function closeMarkPopup() { markPop.classList.remove("show"); }
 
   // ---- 우측 패널 ----
   function renderPanel() {
@@ -487,11 +566,12 @@
     el.style.left = left + "px"; el.style.top = top + "px";
   }
 
-  pageWrap.addEventListener("scroll", () => { closeComposer(); updateProgress(); });
+  pageWrap.addEventListener("scroll", () => { closeComposer(); closeMarkPopup(); hideTip(); updateProgress(); });
   window.addEventListener("resize", updateProgress);
   document.addEventListener("mousedown", (e) => {
     if (e.target.closest(".marker, .region")) return;
     if (composer.classList.contains("show") && !composer.contains(e.target)) closeComposer();
+    if (markPop.classList.contains("show") && !markPop.contains(e.target)) closeMarkPopup();
   });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeComposer(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeComposer(); closeMarkPopup(); } });
 })();
