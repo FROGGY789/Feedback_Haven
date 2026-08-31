@@ -240,7 +240,7 @@
   const pageWrap = $("#pdf-pages"), fbListEl = $("#fb-list"), fbCountEl = $("#fb-count"),
     docTitleEl = $("#doc-title"), docOwnerEl = $("#doc-owner"),
     qCountEl = $("#doc-qcount"), iCountEl = $("#doc-icount"),
-    pageInfo = $("#pdf-pageinfo"), progBar = $("#pdf-progress-bar");
+    pageInfo = $("#pdf-pageinfo"), floatInfo = $("#pdf-float-info"), progBar = $("#pdf-progress-bar");
   let current = null;
 
   async function openDoc(id) {
@@ -521,13 +521,13 @@
   function updateProgress() {
     const pages = $$(".page", pageWrap);
     totalPages = pages.length;
-    if (!pages.length) { pageInfo.textContent = "0 / 0"; progBar.style.width = "0%"; prevBtn.disabled = nextBtn.disabled = true; return; }
+    if (!pages.length) { pageInfo.textContent = floatInfo.textContent = "0 / 0"; progBar.style.width = "0%"; prevBtn.disabled = nextBtn.disabled = true; return; }
     const cr = pageWrap.getBoundingClientRect();
     const mark = cr.top + cr.height * 0.35;
     let cur = 1;
     pages.forEach((pe, i) => { if (pe.getBoundingClientRect().top <= mark) cur = i + 1; });
     curPage = cur;
-    pageInfo.textContent = cur + " / " + pages.length;
+    pageInfo.textContent = floatInfo.textContent = cur + " / " + pages.length;
     progBar.style.width = (cur / pages.length * 100) + "%";
     prevBtn.disabled = cur <= 1;
     nextBtn.disabled = cur >= pages.length;
