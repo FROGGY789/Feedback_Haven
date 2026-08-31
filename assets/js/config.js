@@ -29,8 +29,8 @@ window.APP_CONFIG = {
    *   - KEY:  anon public key  (공개되어도 되는 키입니다)
    *   비워두면 "이 브라우저에만 저장" 모드로 동작합니다.
    * --------------------------------------------------------- */
-  SUPABASE_URL: "",
-  SUPABASE_ANON_KEY: "",
+  SUPABASE_URL: "https://jnmsuwgjdnylsdomaaad.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpubXN1d2dqZG55bHNkb21hYWFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNTEyNjAsImV4cCI6MjEwMzcyNzI2MH0.2JN_mTyJ9MsnGtfzFGh8_agjUg6VCLsOSqvl9_YvylM",
 
   /* -----------------------------------------------------------
    * 4) 이름 목록
