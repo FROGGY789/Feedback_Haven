@@ -316,8 +316,11 @@ body {
 .cmt__avatar { flex:none; width:24px; height:24px; border-radius:999px; background:var(--bg-2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--ink-soft); }
 .cmt__body { min-width:0; }
 .cmt__author { font-size:12px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; gap:6px; }
+.cmt__edit { margin-left:auto; border:0; background:transparent; color:var(--muted); cursor:pointer; font-size:11px; font-weight:600; padding:0 5px; border-radius:5px; }
+.cmt__edit:hover { background:var(--q-50); color:var(--q-700); }
 .cmt__del { border:0; background:transparent; color:var(--muted-2); cursor:pointer; font-size:11px; padding:0 4px; border-radius:5px; }
 .cmt__del:hover { background:var(--q-50); color:var(--q-700); }
+.cmt-edit-input { height:56px; }
 .cmt__text { font-size:13px; line-height:1.65; color:var(--ink-soft); white-space:pre-wrap; word-break:break-word; }
 .cmt-add { align-self:flex-start; height:30px; padding:0 13px; border:1px solid var(--line-2); background:transparent; border-radius:999px; font:inherit; font-size:12px; font-weight:600; color:var(--ink-soft); cursor:pointer; }
 .cmt-add:hover { background:var(--bg-2); }

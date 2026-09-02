@@ -259,7 +259,7 @@
     pageWrap.innerHTML = '<div class="loading">문서를 불러오는 중…</div>';
     fbListEl.innerHTML = "";
     pageInfo.textContent = "… / …"; progBar.style.width = "0%";
-    current = { doc, viewer: null, items: [], comments: [], filter: "all", unsub: null, draft: null, openCommentFor: null, commentText: "" };
+    current = { doc, viewer: null, items: [], comments: [], filter: "all", unsub: null, draft: null, openCommentFor: null, commentText: "", editCommentId: null, editCommentText: "" };
 
     try {
       current.viewer = await PDFViewer.render("pdfs/" + doc.file, pageWrap, { onSelect: openComposer });
@@ -408,7 +408,7 @@
           const txt = (markPop.querySelector(".markpop__edit").value || "").trim();
           if (!txt) return;
           try { await Store.update(f.id, { w: f.w, h: f.h, comment: txt }); closeMarkPopup(); await refresh(); }
-          catch (err) { alert("수정에 실패했습니다."); console.error(err); }
+          catch (err) { alert(err.message || "수정에 실패했습니다."); console.error(err); }
         }
       }));
   }
@@ -426,13 +426,27 @@
       const t = TYPE[f.type] || TYPE.question;
       const cs = commentsFor(f.id);
       const rangeTag = f.w > 0 && f.h > 0 ? '<span class="fb-card__range">범위</span>' : "";
-      const thread = cs.map((c) => `<div class="cmt">
+      const thread = cs.map((c) => {
+        if (current.editCommentId === c.id) {
+          return `<div class="cmt">
+            <span class="cmt__avatar">${esc((c.author || "익").slice(0, 1))}</span>
+            <div class="cmt__body">
+              <textarea class="cmt-input cmt-edit-input">${esc(current.editCommentText)}</textarea>
+              <div class="cmt-compose__actions">
+                <button class="btn btn--soft btn--sm" data-cedit-cancel>취소</button>
+                <button class="btn btn--green btn--sm" data-cedit-save="${esc(c.id)}">저장</button>
+              </div>
+            </div>
+          </div>`;
+        }
+        return `<div class="cmt">
           <span class="cmt__avatar">${esc((c.author || "익").slice(0, 1))}</span>
           <div class="cmt__body">
-            <div class="cmt__author">${esc(c.author || "익명")}${c.mine ? ` <button class="cmt__del" data-del-cmt="${esc(c.id)}" title="삭제">✕</button>` : ""}</div>
+            <div class="cmt__author">${esc(c.author || "익명")}${c.mine ? ` <button class="cmt__edit" data-cedit="${esc(c.id)}" title="수정">수정</button><button class="cmt__del" data-del-cmt="${esc(c.id)}" title="삭제">✕</button>` : ""}</div>
             <div class="cmt__text">${esc(c.comment)}</div>
           </div>
-        </div>`).join("");
+        </div>`;
+      }).join("");
       const compose = current.openCommentFor === f.id
         ? `<div class="cmt-compose">
              <textarea class="cmt-input" placeholder="댓글로 반응을 남겨보세요">${esc(current.commentText || "")}</textarea>
@@ -455,10 +469,9 @@
       </article>`;
     }).join("");
     bindPanel();
-    if (current.openCommentFor) {
-      const inp = $(".cmt-input", fbListEl);
-      if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
-    }
+    const focusEl = current.editCommentId ? $(".cmt-edit-input", fbListEl)
+      : current.openCommentFor ? $(".cmt-input", fbListEl) : null;
+    if (focusEl) { focusEl.focus(); focusEl.setSelectionRange(focusEl.value.length, focusEl.value.length); }
   }
 
   function bindPanel() {
@@ -486,6 +499,28 @@
       b.addEventListener("click", (e) => { e.stopPropagation(); current.openCommentFor = b.dataset.cmtOpen; current.commentText = ""; renderPanel(); }));
     $$("[data-cmt-cancel]", fbListEl).forEach((b) =>
       b.addEventListener("click", (e) => { e.stopPropagation(); current.openCommentFor = null; current.commentText = ""; renderPanel(); }));
+    // 댓글 수정
+    $$("[data-cedit]", fbListEl).forEach((b) =>
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const c = current.comments.find((x) => x.id === b.dataset.cedit);
+        current.editCommentId = b.dataset.cedit; current.editCommentText = c ? c.comment : "";
+        current.openCommentFor = null; renderPanel();
+      }));
+    $$("[data-cedit-cancel]", fbListEl).forEach((b) =>
+      b.addEventListener("click", (e) => { e.stopPropagation(); current.editCommentId = null; renderPanel(); }));
+    $$(".cmt-edit-input", fbListEl).forEach((t) =>
+      t.addEventListener("input", () => { current.editCommentText = t.value; }));
+    $$("[data-cedit-save]", fbListEl).forEach((b) =>
+      b.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const text = (current.editCommentText || "").trim();
+        if (!text) return;
+        const id = b.dataset.ceditSave;
+        current.editCommentId = null;
+        try { await Store.updateComment(id, { comment: text }); await refresh(); }
+        catch (err) { alert(err.message || "댓글 수정에 실패했습니다."); console.error(err); }
+      }));
     $$(".cmt-input", fbListEl).forEach((t) => t.addEventListener("input", () => { current.commentText = t.value; }));
     $$("[data-cmt-save]", fbListEl).forEach((b) =>
       b.addEventListener("click", async (e) => {

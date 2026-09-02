@@ -25,10 +25,12 @@ alter table public.feedback enable row level security;
 -- 필요하면 정책을 더 엄격하게 바꿀 수 있습니다.
 drop policy if exists "feedback read"   on public.feedback;
 drop policy if exists "feedback insert" on public.feedback;
+drop policy if exists "feedback update" on public.feedback;
 drop policy if exists "feedback delete" on public.feedback;
 
 create policy "feedback read"   on public.feedback for select using (true);
 create policy "feedback insert" on public.feedback for insert with check (true);
+create policy "feedback update" on public.feedback for update using (true) with check (true);
 create policy "feedback delete" on public.feedback for delete using (true);
 
 -- =============================================================
@@ -51,10 +53,12 @@ alter table public.comments enable row level security;
 
 drop policy if exists "comments read"   on public.comments;
 drop policy if exists "comments insert" on public.comments;
+drop policy if exists "comments update" on public.comments;
 drop policy if exists "comments delete" on public.comments;
 
 create policy "comments read"   on public.comments for select using (true);
 create policy "comments insert" on public.comments for insert with check (true);
+create policy "comments update" on public.comments for update using (true) with check (true);
 create policy "comments delete" on public.comments for delete using (true);
 
 -- 실시간(Realtime) 반영을 위해 테이블을 publication 에 추가

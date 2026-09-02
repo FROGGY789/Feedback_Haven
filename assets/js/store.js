@@ -71,11 +71,25 @@ const Store = (function () {
       },
 
       async update(id, fb) {
-        const { error } = await client
+        const { data, error } = await client
           .from(TABLE)
           .update({ comment: packComment(fb.w, fb.h, fb.comment) })
-          .eq("id", id);
+          .eq("id", id)
+          .select("id");
         if (error) throw error;
+        if (!data || !data.length)
+          throw new Error("수정 권한이 없습니다. Supabase에서 schema.sql을 다시 실행해 update 정책을 추가하세요.");
+      },
+
+      async updateComment(id, c) {
+        const { data, error } = await client
+          .from(CTABLE)
+          .update({ comment: c.comment || "" })
+          .eq("id", id)
+          .select("id");
+        if (error) throw error;
+        if (!data || !data.length)
+          throw new Error("댓글 수정 권한이 없습니다. Supabase에서 schema.sql을 다시 실행하세요.");
       },
 
       async remove(id) {
@@ -196,6 +210,12 @@ const Store = (function () {
         const arr = read(KEY);
         const it = arr.find((x) => x.id === id);
         if (it) { it.comment = packComment(fb.w, fb.h, fb.comment); write(KEY, arr); }
+      },
+
+      async updateComment(id, c) {
+        const arr = read(CKEY);
+        const it = arr.find((x) => x.id === id);
+        if (it) { it.comment = c.comment || ""; write(CKEY, arr); }
       },
 
       async remove(id) {
