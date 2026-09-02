@@ -96,6 +96,7 @@ window.APP_CONFIG = {
     { id: "yunyerim-eval",     title: "과정중심 수행평가", category: "평가계획", file: "yunyerim-eval.pdf",     teacher: "윤예림", team: "임인숙 멘토팀" },
     { id: "yunyerim-material", title: "학습자료",          category: "학습자료", file: "yunyerim-material.pdf", teacher: "윤예림", team: "임인숙 멘토팀" },
     { id: "sinhyeonho-eval",     title: "과정중심 수행평가", category: "평가계획", file: "sinhyeonho-eval.pdf",     teacher: "신현호", team: "임인숙 멘토팀" },
-    { id: "sinhyeonho-material", title: "학습자료",          category: "학습자료", file: "sinhyeonho-material.pdf", teacher: "신현호", team: "임인숙 멘토팀" }
+    { id: "sinhyeonho-material", title: "학습자료",          category: "학습자료", file: "sinhyeonho-material.pdf", teacher: "신현호", team: "임인숙 멘토팀" },
+    { id: "iminsuk-report",  title: "수업설계 보고서", category: "수업설계", file: "iminsuk-report.pdf", teacher: "임인숙", team: "임인숙 멘토팀" }
   ]
 };
