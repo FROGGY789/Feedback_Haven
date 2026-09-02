@@ -83,21 +83,24 @@
       </div>
     </header>
     <main class="hub">
-      <div class="hub__main">
-        <div class="kicker">Materials</div>
-        <h2 class="display display--md">선생님별 학습자료 · 평가계획</h2>
-        <p class="hub__sub">버튼을 누르면 해당 문서로 바로 들어갑니다.</p>
-        <div id="teacher-list" class="teacher-list"></div>
-      </div>
-      <aside class="guide">
-        <div class="kicker kicker--light">How it works</div>
-        <h3 class="display display--sm guide__title">이 사이트 이용 방법</h3>
-        <div id="guide-steps" class="guide__steps"></div>
-        <div class="guide__legend">
-          <span class="pill pill--q pill--dark"><b>?</b> 궁금한 점</span>
-          <span class="pill pill--i pill--dark"><b>!</b> 인상 깊은 점</span>
+      <div class="hub__top">
+        <div class="hub__intro">
+          <div class="kicker">Materials</div>
+          <h2 class="display display--md">멘토팀별 자료</h2>
+          <p class="hub__sub">버튼을 누르면 해당 문서로 바로 들어갑니다.</p>
         </div>
-      </aside>
+        <aside class="guide">
+          <div class="guide__legend">
+            <span class="pill pill--q pill--dark"><b>?</b> 궁금한 점</span>
+            <span class="pill pill--i pill--dark"><b>!</b> 인상 깊은 점</span>
+          </div>
+          <details class="guide__details">
+            <summary>이 사이트 이용 방법 보기</summary>
+            <div id="guide-steps" class="guide__steps"></div>
+          </details>
+        </aside>
+      </div>
+      <div id="teacher-list" class="teacher-list"></div>
     </main>
   </section>
 
