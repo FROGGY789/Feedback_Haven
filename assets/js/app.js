@@ -128,7 +128,7 @@
     nameGrid.innerHTML = profs.map((p) =>
       `<button class="person" data-nick="${esc(p.nick)}">
         <span class="person__name">${esc(p.nick)}</span>
-        <span class="person__role">${p.name ? esc(p.name) + " 선생님" : "선생님"}</span>
+        <span class="person__role">${esc(p.name || p.nick)} 선생님</span>
       </button>`).join("") +
       `<button class="person person--add" data-nick="${CUSTOM}">
         <span class="person__name">+ 직접 입력</span>

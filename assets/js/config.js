@@ -86,6 +86,16 @@ window.APP_CONFIG = {
 
     // ── 조선희 멘토팀 ──
     { id: "cs-eval",     title: "과정중심 수행평가", category: "평가계획", file: "choseonhui-eval.pdf",     teacher: "조선희", team: "조선희 멘토팀" },
-    { id: "cs-material", title: "학습자료",          category: "학습자료", file: "choseonhui-material.pdf", teacher: "조선희", team: "조선희 멘토팀" }
+    { id: "cs-material", title: "학습자료",          category: "학습자료", file: "choseonhui-material.pdf", teacher: "조선희", team: "조선희 멘토팀" },
+    { id: "osubin-eval",     title: "과정중심 수행평가", category: "평가계획", file: "osubin-eval.pdf",     teacher: "오수빈", team: "조선희 멘토팀" },
+    { id: "osubin-material", title: "학습자료",          category: "학습자료", file: "osubin-material.pdf", teacher: "오수빈", team: "조선희 멘토팀" },
+    { id: "leeyewon-eval",     title: "과정중심 수행평가", category: "평가계획", file: "leeyewon-eval.pdf",     teacher: "이예원", team: "조선희 멘토팀" },
+    { id: "leeyewon-material", title: "학습자료",          category: "학습자료", file: "leeyewon-material.pdf", teacher: "이예원", team: "조선희 멘토팀" },
+
+    // ── 임인숙 멘토팀 ──
+    { id: "yunyerim-eval",     title: "과정중심 수행평가", category: "평가계획", file: "yunyerim-eval.pdf",     teacher: "윤예림", team: "임인숙 멘토팀" },
+    { id: "yunyerim-material", title: "학습자료",          category: "학습자료", file: "yunyerim-material.pdf", teacher: "윤예림", team: "임인숙 멘토팀" },
+    { id: "sinhyeonho-eval",     title: "과정중심 수행평가", category: "평가계획", file: "sinhyeonho-eval.pdf",     teacher: "신현호", team: "임인숙 멘토팀" },
+    { id: "sinhyeonho-material", title: "학습자료",          category: "학습자료", file: "sinhyeonho-material.pdf", teacher: "신현호", team: "임인숙 멘토팀" }
   ]
 };
