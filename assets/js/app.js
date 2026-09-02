@@ -250,6 +250,9 @@
     setWho();
     docTitleEl.textContent = doc.title;
     docOwnerEl.textContent = doc.teacher ? doc.teacher + (doc.grade ? " · " + doc.grade : "") : "";
+    const dl = $("#doc-download");
+    dl.href = "pdfs/" + doc.file;
+    dl.setAttribute("download", (doc.teacher ? doc.teacher + "_" : "") + doc.title + ".pdf");
     show(V.doc);
     // 브라우저 뒤로가기가 사이트를 나가지 않고 목록으로 오도록 히스토리 항목 추가
     try { history.pushState({ fh: "doc", id }, ""); } catch (e) {}
